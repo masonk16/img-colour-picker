@@ -44,5 +44,19 @@ class Extractor:
         return self.img_url
 
     def colour_ex(self):
-        colors_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
-        colors_x
+        self.colors_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
+        return self.colors_x
+
+    def color_to_df(self):
+        colors_pre_list = str(self.colors_x).replace('([(', '').split(', (')[0:-1]
+        df_rgb = [i.split('), ')[0] + ')' for i in colors_pre_list]
+        df_percent = [i.split('), ')[1].replace(')', '') for i in colors_pre_list]
+
+        # convert RGB to HEX code
+        df_color_up = [rgb2hex(int(i.split(", ")[0].replace("(", "")),
+                               int(i.split(", ")[1]),
+                               int(i.split(", ")[2].replace(")", ""))) for i in df_rgb]
+
+        df = pd.DataFrame(zip(df_color_up, df_percent), columns=['c_code', 'occurence'])
+        return df
+
