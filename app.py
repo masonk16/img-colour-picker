@@ -5,6 +5,7 @@ from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_cl
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import SubmitField
+from flask_bootstrap import Bootstrap
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,6 +13,8 @@ load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+
+Bootstrap(app)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'uploads')
