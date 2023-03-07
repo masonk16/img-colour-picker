@@ -1,16 +1,24 @@
-{% extends "bootstrap/base.html" %}
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_form %}
 <title>Upload File</title>
-<h1>Photo Upload</h1>
+{% block content %}
+    <div class="container">
+    <div class="row">
+    <div class="col col-md-auto text-center">
+<h1>Photo Color Extractor</h1>
 <form method="POST" enctype="multipart/form-data">
-     {{ form.hidden_tag() }}
-     {{ form.photo }}
      {% for error in form.photo.errors %}
          <span style="color: red;">{{ error }}</span>
      {% endfor %}
-     {{ form.submit }}
+    {{ render_form(form) }}
+
 </form>
 
 {% if file_url %}
 <br>
 <img src="{{ file_url }}">
 {% endif %}
+    </div>
+    </div>
+    </div>
+{% endblock %}
