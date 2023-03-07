@@ -61,15 +61,15 @@ class Extractor:
         return self.df_colour
 
     def colours_chart(self):
-        list_color = list(self.df_colour['c_code'])
+        self.list_colour = list(self.df_colour['c_code'])
         list_precent = [int(i) for i in list(self.df_colour['occurence'])]
-        text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color,
+        text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(self.list_colour,
                                                                                              list_precent)]
         fig, ax = plt.subplots(figsize=(90, 90), dpi=10)
         wedges, text = ax.pie(list_precent,
                               labels=text_c,
                               labeldistance=1.05,
-                              colors=list_color,
+                              colors=self.list_colour,
                               textprops={'fontsize': 120, 'color': 'black'}
                               )
         plt.setp(wedges, width=0.3)
@@ -80,3 +80,32 @@ class Extractor:
         ax.set_aspect("equal")
         fig.set_facecolor('white')
         return self.plt.show()
+
+    def colour_palette(self):
+        # create background color
+        fig, ax = plt.subplots(figsize=(192, 108), dpi=10)
+        fig.set_facecolor('white')
+        plt.savefig('bg.png')
+        plt.close(fig)
+
+        # create color palette
+        bg = plt.imread('bg.png')
+        fig = plt.figure(figsize=(90, 90), dpi=10)
+        ax = fig.add_subplot(1, 1, 1)
+
+        x_posi, y_posi, y_posi2 = 320, 25, 25
+        for c in self.list_colour:
+            if self.list_colour.index(c) <= 5:
+                y_posi += 125
+                rect = patches.Rectangle((x_posi, y_posi), 290, 115, facecolor=c)
+                ax.add_patch(rect)
+                ax.text(x=x_posi + 360, y=y_posi + 80, s=c, fontdict={'fontsize': 150})
+            else:
+                y_posi2 += 125
+                rect = patches.Rectangle((x_posi + 800, y_posi2), 290, 115, facecolor=c)
+                ax.add_artist(rect)
+                ax.text(x=x_posi + 1160, y=y_posi2 + 80, s=c, fontdict={'fontsize': 150})
+
+        ax.axis('off')
+        plt.imshow(bg)
+        plt.tight_layout()
