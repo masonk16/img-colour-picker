@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import SubmitField
 from flask_bootstrap import Bootstrap5
+from extractor import Extractor
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,6 +23,8 @@ app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(basedir, "uploads")
 photos = UploadSet("photos", IMAGES)
 configure_uploads(app, photos)
 patch_request_class(app)  # set maximum file size, default is 16MB
+
+extractor = Extractor()
 
 
 class UploadForm(FlaskForm):

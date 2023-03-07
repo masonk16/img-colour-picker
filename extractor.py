@@ -47,7 +47,7 @@ class Extractor:
         self.colors_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
         return self.colors_x
 
-    def color_to_df(self):
+    def colour_to_df(self):
         colors_pre_list = str(self.colors_x).replace('([(', '').split(', (')[0:-1]
         df_rgb = [i.split('), ')[0] + ')' for i in colors_pre_list]
         df_percent = [i.split('), ')[1].replace(')', '') for i in colors_pre_list]
@@ -62,12 +62,12 @@ class Extractor:
 
     def colours_chart(self):
         self.list_colour = list(self.df_colour['c_code'])
-        list_precent = [int(i) for i in list(self.df_colour['occurence'])]
-        text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(self.list_colour,
-                                                                                             list_precent)]
+        self.list_percent = [int(i) for i in list(self.df_colour['occurence'])]
+        self.text_c = [c + ' ' + str(round(p * 100 / sum(self.list_percent), 1)) + '%' for c, p in zip(self.list_colour,
+                                                                                             self.list_percent)]
         fig, ax = plt.subplots(figsize=(90, 90), dpi=10)
-        wedges, text = ax.pie(list_precent,
-                              labels=text_c,
+        wedges, text = ax.pie(self.list_percent,
+                              labels=self.text_c,
                               labeldistance=1.05,
                               colors=self.list_colour,
                               textprops={'fontsize': 120, 'color': 'black'}
@@ -109,3 +109,107 @@ class Extractor:
         ax.axis('off')
         plt.imshow(bg)
         plt.tight_layout()
+
+    def colour_donut_palette(self):
+        img = mpimg.imread('<photo location/name>')
+        bg = plt.imread('bg.png')
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(160, 120), dpi=10)
+
+        # donut plot
+        wedges, text = ax1.pie(self.list_percent,
+                               labels=self.text_c,
+                               labeldistance=1.05,
+                               colors=self.list_colour,
+                               textprops={'fontsize': 160, 'color': 'black'})
+        plt.setp(wedges, width=0.3)
+
+        # add image in the center of donut plot
+        imagebox = OffsetImage(img, zoom=2.3)
+        ab = AnnotationBbox(imagebox, (0, 0))
+        ax1.add_artist(ab)
+
+        # color palette
+        x_posi, y_posi, y_posi2 = 160, -170, -170
+        for c in self.list_colour:
+            if self.list_colour.index(c) <= 5:
+                y_posi += 180
+                rect = patches.Rectangle((x_posi, y_posi), 360, 160, facecolor=c)
+                ax2.add_patch(rect)
+                ax2.text(x=x_posi + 400, y=y_posi + 100, s=c, fontdict={'fontsize': 190})
+            else:
+                y_posi2 += 180
+                rect = patches.Rectangle((x_posi + 1000, y_posi2), 360, 160, facecolor=c)
+                ax2.add_artist(rect)
+                ax2.text(x=x_posi + 1400, y=y_posi2 + 100, s=c, fontdict={'fontsize': 190})
+
+        ax2.axis('off')
+        fig.set_facecolor('white')
+        plt.imshow(bg)
+        plt.tight_layout()
+
+    def extract_colour(self, input_image, resize, tolerance, zoom):
+        # background
+        bg = 'bg.png'
+        fig, ax = plt.subplots(figsize=(192, 108), dpi=10)
+        fig.set_facecolor('white')
+        plt.savefig(bg)
+        plt.close(fig)
+
+        # resize
+        output_width = resize
+        img = Image.open(input_image)
+        if img.size[0] >= resize:
+            wpercent = (output_width / float(img.size[0]))
+            hsize = int((float(img.size[1]) * float(wpercent)))
+            img = img.resize((output_width, hsize), Image.ANTIALIAS)
+            resize_name = 'resize_' + input_image
+            img.save(resize_name)
+        else:
+            resize_name = input_image
+
+        # crate dataframe
+        img_url = resize_name
+        colors_x = extcolors.extract_from_path(img_url, tolerance=tolerance, limit=13)
+        df_color = self.colour_to_df(colors_x)
+
+        # annotate text
+        list_color = list(df_color['c_code'])
+        list_precent = [int(i) for i in list(df_color['occurence'])]
+        text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color, list_precent)]
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(160, 120), dpi=10)
+
+        # donut plot
+        wedges, text = ax1.pie(list_precent,
+                               labels=text_c,
+                               labeldistance=1.05,
+                               colors=list_color,
+                               textprops={'fontsize': 150, 'color': 'black'})
+        plt.setp(wedges, width=0.3)
+
+        # add image in the center of donut plot
+        img = mpimg.imread(resize_name)
+        imagebox = OffsetImage(img, zoom=zoom)
+        ab = AnnotationBbox(imagebox, (0, 0))
+        ax1.add_artist(ab)
+
+        # color palette
+        x_posi, y_posi, y_posi2 = 160, -170, -170
+        for c in list_color:
+            if list_color.index(c) <= 5:
+                y_posi += 180
+                rect = patches.Rectangle((x_posi, y_posi), 360, 160, facecolor=c)
+                ax2.add_patch(rect)
+                ax2.text(x=x_posi + 400, y=y_posi + 100, s=c, fontdict={'fontsize': 190})
+            else:
+                y_posi2 += 180
+                rect = patches.Rectangle((x_posi + 1000, y_posi2), 360, 160, facecolor=c)
+                ax2.add_artist(rect)
+                ax2.text(x=x_posi + 1400, y=y_posi2 + 100, s=c, fontdict={'fontsize': 190})
+
+        fig.set_facecolor('white')
+        ax2.axis('off')
+        bg = plt.imread('bg.png')
+        plt.imshow(bg)
+        plt.tight_layout()
+        return plt.show()
