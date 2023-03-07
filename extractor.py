@@ -57,6 +57,26 @@ class Extractor:
                                int(i.split(", ")[1]),
                                int(i.split(", ")[2].replace(")", ""))) for i in df_rgb]
 
-        df = pd.DataFrame(zip(df_color_up, df_percent), columns=['c_code', 'occurence'])
-        return df
+        self.df_colour = pd.DataFrame(zip(df_color_up, df_percent), columns=['c_code', 'occurence'])
+        return self.df_colour
 
+    def colours_chart(self):
+        list_color = list(self.df_colour['c_code'])
+        list_precent = [int(i) for i in list(self.df_colour['occurence'])]
+        text_c = [c + ' ' + str(round(p * 100 / sum(list_precent), 1)) + '%' for c, p in zip(list_color,
+                                                                                             list_precent)]
+        fig, ax = plt.subplots(figsize=(90, 90), dpi=10)
+        wedges, text = ax.pie(list_precent,
+                              labels=text_c,
+                              labeldistance=1.05,
+                              colors=list_color,
+                              textprops={'fontsize': 120, 'color': 'black'}
+                              )
+        plt.setp(wedges, width=0.3)
+
+        # create space in the center
+        plt.setp(wedges, width=0.36)
+
+        ax.set_aspect("equal")
+        fig.set_facecolor('white')
+        return self.plt.show()
