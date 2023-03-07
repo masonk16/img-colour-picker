@@ -16,6 +16,14 @@ class Extractor:
     Extracts colours from image.
     """
 
+    def __init__(self):
+        self.text_c = None
+        self.list_percent = None
+        self.list_colour = None
+        self.df_colour = None
+        self.img_url = None
+        self.colours_x = None
+
     def resize(self, filename):
         """
         Resizes image.
@@ -44,11 +52,11 @@ class Extractor:
         return self.img_url
 
     def colour_ex(self):
-        self.colors_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
-        return self.colors_x
+        self.colours_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
+        return self.colours_x
 
     def colour_to_df(self):
-        colors_pre_list = str(self.colors_x).replace('([(', '').split(', (')[0:-1]
+        colors_pre_list = str(self.colours_x).replace('([(', '').split(', (')[0:-1]
         df_rgb = [i.split('), ')[0] + ')' for i in colors_pre_list]
         df_percent = [i.split('), ')[1].replace(')', '') for i in colors_pre_list]
 
@@ -163,15 +171,15 @@ class Extractor:
             wpercent = (output_width / float(img.size[0]))
             hsize = int((float(img.size[1]) * float(wpercent)))
             img = img.resize((output_width, hsize), Image.ANTIALIAS)
-            resize_name = 'resize_' + input_image
+            resize_name = input_image
             img.save(resize_name)
         else:
             resize_name = input_image
 
         # crate dataframe
         img_url = resize_name
-        colors_x = extcolors.extract_from_path(img_url, tolerance=tolerance, limit=13)
-        df_color = self.colour_to_df(colors_x)
+        colors_x = extcolors.extract_from_path(img_url, tolerance=tolerance, limit=1)
+        df_color = self.colour_to_df()
 
         # annotate text
         list_color = list(df_color['c_code'])

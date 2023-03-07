@@ -39,10 +39,12 @@ def upload_file():
     form = UploadForm()
     if form.validate_on_submit():
         filename = photos.save(form.photo.data)
+        img_loc = f"uploads/{filename}"
+        colour_palette = extractor.extract_colour(img_loc, 700, 11, 3)
         file_url = photos.url(filename)
-    else:
-        file_url = None
-    return render_template("index.html", form=form, file_url=file_url)
+        return render_template("index.html", form=form, file_url=file_url, palette=colour_palette)
+
+    return render_template("index.html", form=form)
 
 
 if __name__ == "__main__":
