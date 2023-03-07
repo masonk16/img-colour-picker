@@ -16,26 +16,33 @@ class Extractor:
     Extracts colours from image.
     """
 
-    def resize(self, input_image, resize, tolerance, zoom):
+    def resize(self, filename):
         """
         Resizes image.
+        :param filename: file to be resized.
         :return: resized image.
         """
-        # background
-        bg = 'bg.png'
-        fig, ax = plt.subplots(figsize=(192, 108), dpi=10)
-        fig.set_facecolor('white')
-        plt.savefig(bg)
-        plt.close(fig)
+        input_name = filename
+        output_width = 900  # set the output size
+        img = Image.open(input_name)
+        wpercent = (output_width / float(img.size[0]))
+        hsize = int((float(img.size[1]) * float(wpercent)))
+        img = img.resize((output_width, hsize), Image.ANTIALIAS)
 
-        # resize
-        output_width = resize
-        img = Image.open(input_image)
-        if img.size[0] >= resize:
-            wpercent = (output_width / float(img.size[0]))
-            hsize = int((float(img.size[1]) * float(wpercent)))
-            img = img.resize((output_width, hsize), Image.ANTIALIAS)
-            resize_name = 'resize_' + input_image
-            img.save(resize_name)
-        else:
-            resize_name = input_imag
+        # save
+        resize_name = 'resize_' + input_name  # the resized image name
+        img.save(resize_name)  # output location can be specified before resize_name
+
+        # read
+        plt.figure(figsize=(9, 9))
+        self.img_url = resize_name
+        img = plt.imread(self.img_url)
+        plt.imshow(img)
+        plt.axis('off')
+        plt.show()
+
+        return self.img_url
+
+    def colour_ex(self):
+        colors_x = extcolors.extract_from_path(self.img_url, tolerance=11, limit=11)
+        colors_x
