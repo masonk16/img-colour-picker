@@ -16,20 +16,22 @@ app = Flask(__name__)
 
 bootstrap = Bootstrap5(app)
 
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app.config['UPLOADED_PHOTOS_DEST'] = os.path.join(basedir, 'uploads')
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+app.config["UPLOADED_PHOTOS_DEST"] = os.path.join(basedir, "uploads")
 
-photos = UploadSet('photos', IMAGES)
+photos = UploadSet("photos", IMAGES)
 configure_uploads(app, photos)
 patch_request_class(app)  # set maximum file size, default is 16MB
 
 
 class UploadForm(FlaskForm):
-    photo = FileField(validators=[FileAllowed(photos, 'Image only!'), FileRequired('File was empty!')])
-    submit = SubmitField('Upload')
+    photo = FileField(
+        validators=[FileAllowed(photos, "Image only!"), FileRequired("File was empty!")]
+    )
+    submit = SubmitField("Upload")
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def upload_file():
     form = UploadForm()
     if form.validate_on_submit():
@@ -37,8 +39,8 @@ def upload_file():
         file_url = photos.url(filename)
     else:
         file_url = None
-    return render_template('index.html', form=form, file_url=file_url)
+    return render_template("index.html", form=form, file_url=file_url)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
